@@ -1,43 +1,17 @@
-//Includes
-#include <stdio.h>                //For printf, scanf and getchar
-#include <windows.h>              //For serial communication
+//Headers
+#include <stdio.h>                  //For printf, scanf and getchar
+#include <windows.h>                //For serial communication
+#include "CC_CmdControlSerial.h"    //Main function
 
-//Constants
-#define MESSAGE1                "Welcome to the strip leds control\n\r"
-#define MESSAGE2                "The application which allows you to control your led lights\n\r"
-#define MESSAGE3                "Running over the hardware: "
-#define HARDWARE                "Should be asked to the board\n\r"
-#define MESSAGE4                "With a uC: "
-#define MICROCONTROLLER         "Should be asked to the board\n\r"
-#define MESSAGE5                "Board's firmware version: "
-#define FIRMWARE_VER            "Should be asked to the board\n\r"
-#define MESSAGE6                "Board identifier: "
-#define BOARD_ID                "Should be asked to the board\n\r"
-#define MESSAGE7                "Software running over command-prompt version: "
-#define SOFTWARE_VER            "version 0.1\n\r"
-#define MESSAGE8                "Please select the color you would like\n\r"
-#define MESSAGE9                "Red(R)\n\rGreen(G)\n\rBlue(B)\n\rWhite(W)\n\rYellow(Y)\n\rPink(P)\n\rCyan(C)\n\rOff(O)\n\rOr just exit the application(E)\n\r"
-#define MESSAGE10               "Wrong selection, please try again\n\r"
-#define MESSAGE11               "Thanks for using our devices\n\rGoodbye!\n\r"
-#define MESSAGE_RETURN 	        "\n\r"
-#define MESSAGE_TRIPLERETURN 	"\n\r\n\r\n\r"
-#define TRUE 1
-#define FALSE 0
-
-//Function prototypes
-void setcolor(void);
-void clearInputBuffer(void);
-void openSerialPort(const char*, DWORD);
-void sendCharacter(char);
-
-//Global variables
-char caption=0;
-unsigned char out=FALSE;
+//Global variables declaration
 HANDLE hSerialPort;
 
 //Functions
 int main()
 {    
+    char caption=0;
+    unsigned char out=FALSE;
+
     openSerialPort("COM3", 115200);
     printf (MESSAGE1);
     printf (MESSAGE2);
@@ -56,11 +30,11 @@ int main()
 
     while (out==FALSE)
     {
-        caption=0;
-        scanf ("%c", &caption);
-        clearInputBuffer();
+        caption=0;                          //Clean the character gotten
+        scanf ("%c", &caption);             //Get the character
+        clearInputBuffer();                 //Clean the serial's input buffer
         if (
-            (caption=='R'||caption=='r')||
+            (caption=='R'||caption=='r')||  //Check if a correct color is selected
             (caption=='G'||caption=='g')||
             (caption=='B'||caption=='b')||
             (caption=='W'||caption=='w')||
@@ -70,62 +44,62 @@ int main()
             (caption=='O'||caption=='o')
             )
         {
-            setcolor();
-            out=FALSE;
+            setcolor(caption);                  //If so, is send to the board              
+            out=FALSE;                          //Loop again
         }
-        else if ((caption=='E'||caption=='e'))
+        else if ((caption=='E'||caption=='e'))  //Check for an exit order
         {
-            out=TRUE;
-            printf (MESSAGE11);
+            out=TRUE;                           //Loop exit
+            printf (MESSAGE11);         
         }
         else
         {
-            printf (MESSAGE10);
+            printf (MESSAGE10);                 //If not, error message
         }
     }  
     return 0;
 }
 
-void setcolor(void)
+void setcolor(char action)
 {
-    if (caption=='R'||caption=='r')
+    if (action=='R'||action=='r')
     {
-        printf ("Leds vermell\n\r");
-        sendCharacter('R');
+        printf (MESSAGE12);     //Message to the user
+        sendCharacter('R');     //Order to the board
     }
-    if (caption=='G'||caption=='g')
+    if (action=='G'||action=='g')
     {
-        printf ("Leds verd\n\r");
+        printf (MESSAGE13);
         sendCharacter('G');
     }
-    if (caption=='B'||caption=='b')
+    if (action=='B'||action=='b')
     {
-        printf ("Leds blau\n\r");
+        printf (MESSAGE14);
         sendCharacter('B');
     }
-    if (caption=='W'||caption=='w')
+    if (action=='W'||action=='w')
     {
-        printf ("Leds blanc\n\r");
+        printf (MESSAGE15);
         sendCharacter('W');
     }
-    if (caption=='Y'||caption=='y')
+    if (action=='Y'||action=='y')
     {
-        printf ("Leds groc\n\r");
+        printf (MESSAGE16);
         sendCharacter('Y');
     }
-    if (caption=='P'||caption=='p')
+    if (action=='P'||action=='p')
     {
-        printf ("Leds rosa\n\r");
+        printf (MESSAGE17);
         sendCharacter('P');
     }
-    if (caption=='C'||caption=='c')
+    if (action=='C'||action=='c')
     {
-        printf ("Leds cian\n\r");
+        printf (MESSAGE18);
         sendCharacter('C');
     }
-    if (caption=='O'||caption=='o')
+    if (action=='O'||action=='o')
     {
-        printf ("Leds apagats\n\r");
+        printf (MESSAGE19);
         sendCharacter('O');
     }
 }
