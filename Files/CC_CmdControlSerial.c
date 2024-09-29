@@ -1,5 +1,6 @@
 //Includes
-#include <stdio.h>
+#include <stdio.h>                //For printf, scanf and getchar
+#include <windows.h>              //For serial communication
 
 //Constants
 #define MESSAGE1                "Welcome to the strip leds control\n\r"
@@ -26,13 +27,18 @@
 //Function prototypes
 void setcolor(void);
 void clearInputBuffer(void);
+void openSerialPort(const char*, DWORD);
+void sendCharacter(char);
 
 //Global variables
 char caption=0;
 unsigned char out=FALSE;
+HANDLE hSerialPort;
 
+//Functions
 int main()
-{
+{    
+    openSerialPort("COM3", 115200);
     printf (MESSAGE1);
     printf (MESSAGE2);
     printf (MESSAGE3);
@@ -85,34 +91,42 @@ void setcolor(void)
     if (caption=='R'||caption=='r')
     {
         printf ("Leds vermell\n\r");
+        sendCharacter('R');
     }
     if (caption=='G'||caption=='g')
     {
         printf ("Leds verd\n\r");
+        sendCharacter('G');
     }
     if (caption=='B'||caption=='b')
     {
         printf ("Leds blau\n\r");
+        sendCharacter('B');
     }
     if (caption=='W'||caption=='w')
     {
         printf ("Leds blanc\n\r");
+        sendCharacter('W');
     }
     if (caption=='Y'||caption=='y')
     {
         printf ("Leds groc\n\r");
+        sendCharacter('Y');
     }
     if (caption=='P'||caption=='p')
     {
         printf ("Leds rosa\n\r");
+        sendCharacter('P');
     }
-        if (caption=='C'||caption=='c')
+    if (caption=='C'||caption=='c')
     {
         printf ("Leds cian\n\r");
+        sendCharacter('C');
     }
     if (caption=='O'||caption=='o')
     {
         printf ("Leds apagats\n\r");
+        sendCharacter('O');
     }
 }
 
@@ -125,4 +139,37 @@ void clearInputBuffer(void)
     {
         character=getchar();                            //Gets a character from input buffer 
     } while ((character!='\n') && (character!=EOF));    //Until the end of string or end of file
+}
+void openSerialPort(const char* portName, DWORD baudRate)
+{
+    hSerialPort = CreateFileA(portName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (hSerialPort == INVALID_HANDLE_VALUE)
+    {
+        // Handle error
+    }
+
+    DCB dcb = { 0 };
+    dcb.DCBlength = sizeof(DCB);
+    if (!GetCommState(hSerialPort, &dcb))
+    {
+        // Handle error
+    }
+
+    dcb.BaudRate = baudRate;
+    dcb.ByteSize = 8;
+    dcb.StopBits = ONESTOPBIT;
+    dcb.Parity = NOPARITY;
+    if (!SetCommState(hSerialPort, &dcb))
+    {
+        // Handle error
+    }
+}
+
+void sendCharacter(char character)
+{
+    DWORD bytesWritten;                                                 // Number of bytes written. Returned by WriteFile
+    if (!WriteFile(hSerialPort, &character, 1, &bytesWritten, NULL))
+    {
+        // Handle error
+    }
 }
